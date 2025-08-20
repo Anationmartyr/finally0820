@@ -288,6 +288,7 @@
         // 用户答案
         const answers = Array(18).fill(0);
         let currentPage = 0;
+        let answers = {}; // 存储所有问题的答案
 
         // DOM元素
         const homePage = document.getElementById('home-page');
@@ -545,7 +546,22 @@
                 document.getElementById('result-combo').classList.remove('hidden');
             }
         }
+    // 提交表单
+    async function submitForm() {
+      const data = { answers };
 
+      const resp = await fetch('https://formspree.io/f/mgvzjwyz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      //if (resp.ok) {
+      //  alert('提交成功！');
+      //} else {
+      //  alert('提交失败，请稍后重试。');
+      //}
+    }
         // 事件监听
         startBtn.addEventListener('click', initSurvey);
         
@@ -570,7 +586,15 @@
             }
             
             if (currentPage < questions.length - 1) {
+                                // 获取当前页的答案
+      const pageQuestions = questions[currentPage];
+      pageQuestions.forEach((question, index) => {
+        const selectedOption = document.querySelector(`input[name="question${currentPage}_${index}"]:checked`);
+        if (selectedOption) {
+          answers[`question${currentPage}_${index}`] = selectedOption.value;
+            }}
                 currentPage++;
+                
                 renderQuestions(currentPage);
                 updateProgress();
                 window.scrollTo(0, 0);
